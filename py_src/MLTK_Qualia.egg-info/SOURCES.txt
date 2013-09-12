@@ -1,4 +1,3 @@
-README
 setup.py
 py_src/MLTK_Qualia.egg-info/PKG-INFO
 py_src/MLTK_Qualia.egg-info/SOURCES.txt

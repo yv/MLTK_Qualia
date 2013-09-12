@@ -43,6 +43,7 @@ class FilePatternDict(dict):
     def __missing__(self, k):
         fname=self.pat%{'pos_tag':k}
         alph=CPPUniAlphabet(want_utf8=self.want_utf8)
+        print >>sys.stderr, "[FilePatternDict] load %s"%(fname,)
         alph.fromfile_utf8(file(fname))
         alph.growing=False
         self[k]=alph
@@ -87,7 +88,7 @@ class Dataset:
                 print >>sys.stderr, "Non-matching line:",l
             else:
                 data.append(m.groups()[:-1])
-                labels.append([[m.groups()[-1]]])
+                labels.append([m.groups()[-1]])
         self.data=data
         self.labels=labels
     def load_alphabet(self, key=None):
@@ -100,13 +101,23 @@ class Dataset:
         else:
             return get_word_alphs_by_pos(self.lang)[self.postags[key]]
     def check_alphabets(self):
+        ok=True
         alph=self.load_alphabet(None)
         for dat in self.data:
-            alph['_'.join(dat)]
+            try:
+                alph['_'.join(dat)]
+            except KeyError:
+                print >>sys.stderr, "missing pair:", '_'.join(dat)
+                ok=False
         for i,p in enumerate(self.postags):
             alph=self.load_alphabet(i)
             for dat in self.data:
-                alph[dat[i]]
+                try:
+                    alph[dat[i]]
+                except KeyError:
+                    print >>sys.stderr, "missing word:", dat[i]
+                    ok=False
+        return ok
     def add_to_vocabulary(self, item_sets):
         p=''.join(self.postags)
         items=item_sets[p]

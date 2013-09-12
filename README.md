@@ -1,4 +1,4 @@
-MLTK_Qualia -- Code for Learning of Qualia and Compound Relations
+MLTK_Qualia -- Supervised Learning of Semantic Relations
 =================================================================
 
 The tools in this package can be used to extract co-occurrence matrices
@@ -43,6 +43,8 @@ dist_sim:
         postags: [N,V]
 ```
 
+Datasets are declared with their path, a pattern to parse the respective file (where ``W'' stands for
+one word from the word pair, and ``L'' stands for the gold-standard label(s)).
 
 Creating Feature Matrices
 -------------------------
@@ -52,8 +54,26 @@ Feature matrices are created from collocations in a large corpus.
 The first step is to extract the needed vocabulary from the datasets with which
 you want to do classification:
 
-    compile_alphabets --language DE
+    compile_alphabets --lang DE
 
 (You can also create the vocabulary yourself as a one-word-per-line file, prefixed with the number
 of entries in the file).
 
+After having gotten hold of a suitably large corpus, you can proceed to
+creating feature matrices for the single words in your datasets as well as
+for the word pairs (of differen POS categories) that occur there.
+
+First, create a list of the most frequent unigrams and bigrams in your corpus
+by using
+
+    make_bigram_alph --lang DE
+
+and then compile feature vectors for these unigrams/bigrams with
+
+    bow_learn --lang DE
+
+which you then need to move to the locations that you have given in your .pytree.yml.
+
+Finally, you can create a JSON file for your dataset with all the requisite features:
+
+    create_features -m pair_bow_NEWS_DMOZ -G hyper --lang DE qualia

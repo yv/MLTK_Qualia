@@ -72,8 +72,8 @@ oparse.add_option('-2',dest='wmatrices2',
                   help='word features to be used for w2, separated by commas')
 oparse.add_option('-G','--germanet',dest='germanet',
                   choices=['none','hyper'],
-                  default='hyper',
-                  help='GermaNet-based features for single words')
+                  default='none',
+                  help='GermaNet/WordNet-based features for single words')
 oparse.add_option('--transform',dest='transform',
                   choices=['mi','mi_discount','l1','ll'],
                   default='mi_discount',
@@ -103,8 +103,7 @@ def main(argv=None):
     data=get_dataset(opts.dataset, opts.language)
     pos_pair=data.postags
     env={'lang':opts.language, 'pos_tag': pos_pair}
-    pair_alph=CPPUniAlphabet(want_utf8=True)
-    pair_alph.fromfile(file(pair_alph_path%env))
+    pair_alph=data.load_alphabet(None)
     pair_features=[]
     for k in opts.matrices.split(','):
         if k=='': continue
@@ -141,19 +140,19 @@ def main(argv=None):
     #     expander=GWN_Expander()
     # elif opts.expand=='combo':
     #     expander=DS_GWN_Expander()
-
-    w1_alph=word_alphs[pos_pair[0]]
+    w1_alph=data.load_alphabet(0)
     w1_features=word_features[pos_pair[0]]
-    w2_alph=word_alphs[pos_pair[1]]
+    w2_alph=data.load_alphabet(1)
     w2_features=word_features[pos_pair[1]]
-    for wpair, gold_label in izip(data.data, data.labels):
-        wpair='_'.join(wpair)
+    print >>sys.stderr, pos_pair, w1_alph.get_sym(0), w2_alph.get_sym(0)
+    for (w1orig,w2orig), gold_label in izip(data.data, data.labels):
+        wpair='%s_%s'%(w1orig,w2orig)
         try:
             pair_idx=pair_alph[wpair.replace('#','')]
         except KeyError:
             print >>sys.stderr, "Not found: %s"%(wpair,)
         else:
-            w1,w2orig=wpair.split('_')
+            w1=w1orig
             w2=w2orig.replace('#','')
             features=single_word_features(w1,w2)
             all_features=[features]
@@ -165,7 +164,7 @@ def main(argv=None):
                     except KeyError:
                         all_features.append([])
             except KeyError:
-                print >>sys.stderr, "No such w1: %s"%(w1,)
+                print >>sys.stderr, "No such w1: %s"%(w1,), wpair
             try:
                 idx2=w2_alph[w2]
                 for feat in w2_features:
@@ -174,7 +173,7 @@ def main(argv=None):
                     except KeyError:
                         all_features.append([])
             except KeyError:
-                print >>sys.stderr, "No such w2: %s"%(w1,)
+                print >>sys.stderr, "No such w2: %s"%(w2,), wpair
             if simfact1 is not None:
                 if opts.method=='scale':
                     all_features.append([('w1_'+k,v) for (k,v) in simfact1.raw_features(w1)])
@@ -206,4 +205,4 @@ def main(argv=None):
             #             all_features.append(mat.get_max_features(idxs,'x_'))
             #         except IndexError:
             #             pass
-        print json.dumps([0, {'_type':'multipart','parts':all_features}, [gold_label], wpair])
+        print json.dumps([0, {'_type':'multipart','parts':all_features}, gold_label, wpair])

@@ -1,4 +1,5 @@
 import sys
+import numpy
 from pcfg_site_config import ConfigValue
 from alphabet import CPPUniAlphabet
 from mltk import Factory
@@ -174,15 +175,18 @@ simfact=SimilarityFactory(lang='DE',
                           matrix_names=ConfigValue('dist_sim.$lang.default_matrices.$pos_tag'))
 
 class FeatureMatrix(Factory):
-    def load_component_alph(self,name):
+    def load_component_alph(self):
+        name=self.matrix_name
         alph=CPPUniAlphabet()
         alph.fromfile(self.open_by_pat('component_alph',matrix_name=name))
-        if self.max_range is None:
-            self.max_range=len(alph)
         return alph
-    def load_transformed_mat(self,name):
+    def load_transformed_mat(self):
+        name=self.matrix_name
+        bound=self.bound
+        thr_val=self.thr_val
+        method=self.method
         f_in=self.open_by_pat('component_mat',matrix_name=name)
-        mat=sparsmat.mmapCSR(f_in).transform_mi_discount()
+        orig_mat=sparsmat.mmapCSR(f_in)
         # Step one: weighting function
         transform=self.transform
         if transform=='mi_discount':
@@ -196,9 +200,8 @@ class FeatureMatrix(Factory):
         else:
             assert False, transform
         # Step 2: calculate thresholds
-        bound=self.bound
         if bound=='const':
-            thresholds=numpy.zeros(len(self.alph))
+            thresholds=numpy.zeros(len(self.get('component_alph')))
             thresholds+=thr_val
         elif bound=='norm':
             thresholds=orig_mat.thresholds_norm(thr_val)

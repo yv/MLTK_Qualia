@@ -1,0 +1,6 @@
+[console_scripts]
+make_bigram_alph = mltk_qualia.make_bigram_alph:main
+bow_learn = mltk_qualia.bow_learn:main
+create_features = mltk_qualia.create_features:main
+compile_alphabets = mltk_qualia.task_config:compile_alphabets_main
+

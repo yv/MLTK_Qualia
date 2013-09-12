@@ -1,0 +1,17 @@
+The task_config module contains code that extracts needed words or pairs
+from a dataset and provides a convenient wrapper around its data.
+
+    >>> from mltk_qualia import task_config
+    >>> db=task_config.get_dataset('tratz','EN')
+    >>> alph1=db.load_alphabet(0)
+    >>> alph1['gargleblasterDoesNotExistHere']
+    Traceback (most recent call last):
+      File "/usr/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest test_install.txt[3]>", line 1, in <module>
+        alph1['gargleblasterDoesNotExistHere']
+      File "alphabet.pyx", line 234, in alphabet.CPPUniAlphabet.__getitem__ (pyx_src/alphabet.cpp:5637)
+    KeyError
+    >>> alph1['audience']
+    1008
+    >>> db.check_alphabets()

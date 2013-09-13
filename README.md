@@ -74,6 +74,9 @@ and then compile feature vectors for these unigrams/bigrams with
 
 which you then need to move to the locations that you have given in your .pytree.yml.
 
+Putting Everything Together
+---------------------------
+
 Finally, you can create a JSON file for your dataset with all the requisite features:
 
     create_features -G hyper --lang DE qualia > gwn.json

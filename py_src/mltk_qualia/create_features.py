@@ -150,7 +150,7 @@ def main(argv=None):
         try:
             pair_idx=pair_alph[wpair.replace('#','')]
         except KeyError:
-            print >>sys.stderr, "Not found: %s"%(wpair,)
+            print >>sys.stderr, "Not found: %s"%(repr(wpair),)
         else:
             w1=w1orig
             w2=w2orig.replace('#','')
@@ -197,7 +197,7 @@ def main(argv=None):
                 try:
                     all_features.append(mat.get_features(pair_idx))
                 except IndexError:
-                    print >>sys.stderr, "No features found: %s"%(wpair,)
+                    print >>sys.stderr, "No features found: %s"%(repr(wpair),)
             # if opts.expand!='none':
             #     idxs=expand_pairs(w1,w2,expander,pair_alph)
             #     for mat in pair_features:

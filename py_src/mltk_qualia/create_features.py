@@ -164,7 +164,7 @@ def main(argv=None):
                     except KeyError:
                         all_features.append([])
             except KeyError:
-                print >>sys.stderr, "No such w1: %s"%(w1,), wpair
+                print >>sys.stderr, "No such w1: %s"%(repr(w1),), wpair
             try:
                 idx2=w2_alph[w2]
                 for feat in w2_features:
@@ -173,7 +173,7 @@ def main(argv=None):
                     except KeyError:
                         all_features.append([])
             except KeyError:
-                print >>sys.stderr, "No such w2: %s"%(w2,), wpair
+                print >>sys.stderr, "No such w2: %s"%(repr(w2),), wpair
             if simfact1 is not None:
                 if opts.method=='scale':
                     all_features.append([('w1_'+k,v) for (k,v) in simfact1.raw_features(w1)])
@@ -192,7 +192,7 @@ def main(argv=None):
                     except KeyError:
                         all_features.append([])
             except KeyError:
-                print >>sys.stderr, "No such w2: %s"%(w2,)
+                print >>sys.stderr, "No such w2: %s"%(repr(w2),)
             for mat in pair_features:
                 try:
                     all_features.append(mat.get_features(pair_idx))

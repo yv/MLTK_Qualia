@@ -82,7 +82,7 @@ class Dataset:
         pat=get_regex_for_pattern(conf['pattern'])
         data=[]
         labels=[]
-        for l in file(conf['path']):
+        for l in codecs.open(conf['path'],'r','UTF-8'):
             m=pat.match(l)
             if not m:
                 print >>sys.stderr, "Non-matching line:",l

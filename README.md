@@ -76,4 +76,19 @@ which you then need to move to the locations that you have given in your .pytree
 
 Finally, you can create a JSON file for your dataset with all the requisite features:
 
-    create_features -m pair_bow_NEWS_DMOZ -G hyper --lang DE qualia
+    create_features -G hyper --lang DE qualia > gwn.json
+    create_features -m pair_bow_NEWS_DMOZ -G hyper --lang DE qualia > gwn_w12.json
+
+Using MLTK's *xvalidate_mlab* program, you can then perform cross-validation experiments:
+
+    xvalidate_mlab --learner svmAcc gwn.json
+
+should give a dice score of 0.864 and
+
+    xvalidate_mlab --learner svmAcc gwn_w12.json
+
+should give a dice score of 0.884, and
+
+    xvalidate_mlab --learner svmAcc --featsel chi2 --featsize 0,10000 gwn_w12.json
+
+would give you a dice score of 0.889 (micro-F of 0.624).
